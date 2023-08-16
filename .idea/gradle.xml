@@ -13,6 +13,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/AidlClient" />
+            <option value="$PROJECT_DIR$/aidlremote" />
           </set>
         </option>
       </GradleProjectSettings>
