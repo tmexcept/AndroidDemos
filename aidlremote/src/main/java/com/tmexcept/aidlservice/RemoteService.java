@@ -11,7 +11,7 @@ public class RemoteService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(TAG, "aidl Service onBind "+iBinder);
+        Log.e(TAG, "aidl RemoteService onBind "+iBinder);
         return iBinder;
     }
 
@@ -19,14 +19,14 @@ public class RemoteService extends Service {
 
         @Override
         public int add(int num1, int num2) throws RemoteException {
-            Log.e(TAG, "aidl Service add thread="+Thread.currentThread());
+            Log.e(TAG, "aidl RemoteService add thread="+Thread.currentThread());
             try {
                 Thread.sleep(2000);
 //                wait(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            Log.e(TAG, "aidl Service add "+num1+"   "+num2);
+            Log.e(TAG, "aidl RemoteService add "+num1+"   "+num2);
             return num1 + num2;
         }
 
@@ -37,33 +37,33 @@ public class RemoteService extends Service {
 
         @Override
         public int minus(int num1, int num2) throws RemoteException {
-            Log.e(TAG, "aidl Service minus thread="+Thread.currentThread());
+            Log.e(TAG, "aidl RemoteService minus thread="+Thread.currentThread());
             try {
                 Thread.sleep(2000);
 //                wait(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            Log.e(TAG, "aidl Service end minus "+num1+"   "+num2);
+            Log.e(TAG, "aidl RemoteService end minus "+num1+"   "+num2);
             return num1 - num2;
         }
 
         @Override
         public int testParam(int num1, int num2, int num3, int num4) throws RemoteException {
-            Log.e(TAG, "aidl Service testParam "+num1+"   "+num2+"   "+num3+"   "+num4);
+            Log.e(TAG, "aidl RemoteService testParam "+num1+"   "+num2+"   "+num3+"   "+num4);
             return 999;
         }
 
         @Override
         public void minus2(int num1, int num2) throws RemoteException {
-            Log.e(TAG, "aidl Service minus2 thread="+Thread.currentThread());
+            Log.e(TAG, "aidl RemoteService minus2 thread="+Thread.currentThread());
             try {
                 Thread.sleep(2000);
 //                wait(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            Log.e(TAG, "aidl Service minus2 end "+num1+"   "+num2);
+            Log.e(TAG, "aidl RemoteService minus2 end "+num1+"   "+num2);
 //            return num1 - num2;
         }
     };

@@ -19,13 +19,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.tmexcept.R;
 import com.tmexcept.aidlservice.AidlInterface;
-import com.tmexcept.aidlservice.ClientService;
 
-public class MainActivity extends AppCompatActivity implements ServiceConnection{
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "AIDL-MainActivity";
     private volatile boolean mIsServiceConnected = false;
     private final ConditionVariable mServiceConnectionWaitLock = new ConditionVariable();
-    private Button testClientService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,9 +34,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     protected void onResume() {
         super.onResume();
         initView();
-        bindService();
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -51,13 +49,23 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
 
     private void initView() {
-        testClientService = findViewById(R.id.testClientService);
-
-        testClientService.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.bindClientService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bindClientService();
+            }
+        });
+        findViewById(R.id.bindRemoteService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bindRemoteService();
+            }
+        });
+        findViewById(R.id.testClientService).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(proxy == null) {
-                    Toast.makeText(MainActivity.this, "未绑定Service", Toast.LENGTH_SHORT).show();
+                if (proxy == null) {
+                    Toast.makeText(MainActivity.this, "未绑定ClientService", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -71,15 +79,47 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                     Log.d(TAG, "testParam: start==================");
                     int paramR = proxy.testParam(3, 4, 5);
-                    Log.d(TAG, "testParam: end "+paramR);
+                    Log.d(TAG, "testParam: end " + paramR);
 
                     Log.d(TAG, "testParam2: start==================");
                     int paramR2 = proxy.testParam2(3);
-                    Log.d(TAG, "testParam2: end "+paramR2);
+                    Log.d(TAG, "testParam2: end " + paramR2);
 
                     Log.d(TAG, "minus2: start==================");
                     int minus2 = proxy.minus2(3, 4);//服务端延时造成卡住
-                    Log.d(TAG, "minus2: end "+minus2);
+                    Log.d(TAG, "minus2: end " + minus2);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        findViewById(R.id.testRemoteService).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (proxyRemote == null) {
+                    Toast.makeText(MainActivity.this, "未绑定RemoteService", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Log.d(TAG, "testClientService  start==================");
+                try {
+//                    int addR = proxy.add(6, 2);
+//                    Log.d(TAG, "add: result = "+ addR);
+                    Log.d(TAG, "minus: start==================");
+                    proxyRemote.minus(6, 2);
+                    Log.d(TAG, "minus: end");
+
+                    Log.d(TAG, "testParam: start==================");
+                    int paramR = proxyRemote.testParam(3, 4, 5);
+                    Log.d(TAG, "testParam: end " + paramR);
+
+                    Log.d(TAG, "testParam2: start==================");
+                    int paramR2 = proxyRemote.testParam2(3);
+                    Log.d(TAG, "testParam2: end " + paramR2);
+
+                    Log.d(TAG, "minus2: start==================");
+                    int minus2 = proxyRemote.minus2(3, 4);//服务端延时造成卡住
+                    Log.d(TAG, "minus2: end " + minus2);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -90,60 +130,87 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     /**
      * 绑定服务
      */
-    private void bindService() {
+    private void bindClientService() {
         Intent intent = new Intent();
         intent.setClassName(this.getBaseContext(), "com.tmexcept.aidlservice.ClientService");
-        boolean ret = bindService(intent, this, Context.BIND_AUTO_CREATE);
-        Log.d(TAG, "bindService: ret = "+ ret);
-        new Thread(new Runnable()
-        {
+        boolean ret = bindService(intent, connectionClient, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "bindService: ret = " + ret);
+    }
+
+    /**
+     * 绑定服务
+     */
+    private void bindRemoteService() {
+        Intent intent = new Intent();
+        intent.setClassName("com.tmexcept.aidlservice", "com.tmexcept.aidlservice.RemoteService");
+        boolean ret = bindService(intent, connectionRemote, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "bindService: ret = " + ret);
+        if(!ret) {
+            Toast.makeText(this, "bindRemoteService失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new Thread(new Runnable() {
             @Override
-            public void run()
-            {
-                Log.d(TAG, "bindService: Thread="+ this);
+            public void run() {
+                Log.d(TAG, "bindService: Thread=" + this);
                 runOnUiThread(new SetTextRunnable("Waiting to talk to IMyService..."));
                 // Not connected to service yet?
-                while(!mIsServiceConnected)
-                {
+                while (!mIsServiceConnected) {
                     mServiceConnectionWaitLock.block(); // waits for service connection
                 }
 
-                runOnUiThread(new SetTextRunnable("Talked to IMyService. Returned : .............." ));
+                runOnUiThread(new SetTextRunnable("Talked to IMyService. Returned : .............."));
             }
         }).start();
     }
 
-    private class SetTextRunnable implements Runnable
-    {
+    private class SetTextRunnable implements Runnable {
         final String mText;
 
-        SetTextRunnable(String text)
-        {
+        SetTextRunnable(String text) {
             mText = text;
         }
 
         @Override
-        public void run()
-        {
+        public void run() {
             Log.d(TAG, mText);
         }
     }
 
     AidlInterface proxy;
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        proxy = AidlInterface.Stub.asInterface(service);
-        Log.w(TAG, "aidl client onServiceConnected onBind "+service +"   "+proxy);
-        Log.d(TAG, "[App] [java] onServiceConnected");
-        mIsServiceConnected = true;
-        mServiceConnectionWaitLock.open(); // breaks service connection waits
-    }
+    AidlInterface proxyRemote;
+    private ServiceConnection connectionClient = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            proxy = AidlInterface.Stub.asInterface(iBinder);
+            Log.w(TAG, "aidl client onServiceConnected onBind " + iBinder + "   " + proxy);
+            Log.d(TAG, "[App] [java] onServiceConnected");
+            mIsServiceConnected = true;
+            mServiceConnectionWaitLock.open(); // breaks service connection waits
+        }
 
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        mIsServiceConnected = false;
-        Log.d(TAG, "[App] [java] onServiceDisconnected");
-    }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mIsServiceConnected = false;
+            Log.d(TAG, "[App] [java] onServiceDisconnected");
+        }
+    };
+
+    private ServiceConnection connectionRemote = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            proxyRemote = AidlInterface.Stub.asInterface(iBinder);
+            Log.w(TAG, "aidl clientRemote onServiceConnected onBind " + iBinder + "   " + proxyRemote);
+            Log.d(TAG, "[App] [java] onServiceConnected");
+            mIsServiceConnected = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mIsServiceConnected = false;
+            Log.d(TAG, "[App] [java] onServiceDisconnected");
+        }
+    };
 
     @Override
     protected void onDestroy() {
