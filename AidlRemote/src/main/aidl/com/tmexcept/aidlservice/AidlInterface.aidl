@@ -10,7 +10,7 @@ interface AidlInterface {
      */
     int add(int num1,int num2);
     int getNum();
-    int minus(int num1,int num2);//与服务端返回值、oneway修饰符不一致，仍然可以正常调用
+    int minus(int num1,int num2);//与服务端返回值、oneway修饰符不一致，仍然可以正常调用；此处不使用oneway修饰服务端耗时操作会卡住客户端执行
     int testParam(int num1,int num2, int num3, int num4);//参数数量不一致情况能正常调用，如果服务端有返回值，且客户端可以接收，则能正常接收
-    oneway void minus2(int num1,int num2);
+    oneway void minus2(int num1,int num2);//todo oneway 修饰的方法不能有返回值
 }

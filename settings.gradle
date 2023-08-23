@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "AndroidDemos"
 include ':AidlClient'
-include ':aidlremote'
+include ':AidlRemote'
