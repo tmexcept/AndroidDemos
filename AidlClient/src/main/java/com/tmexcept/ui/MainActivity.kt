@@ -1,52 +1,44 @@
 package com.tmexcept.ui
 
-import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.ConditionVariable
 import android.os.IBinder
-import android.os.Looper
 import android.os.RemoteException
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.tmexcept.R
 import com.tmexcept.aidlservice.AidlInterface
-import com.tmexcept.aidlservice.ClientService
 
 class MainActivity : AppCompatActivity() {
     @Volatile
     private var mIsServiceConnected = false
     private val mServiceConnectionWaitLock = ConditionVariable()
+    lateinit var bindClientService : TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        bindClientService = findViewById(R.id.bindClientService)
+        val jumpTestCreateTime = findViewById<View>(R.id.jumpTestCreateTime)
+        jumpTestCreateTime.setOnClickListener {
+            startActivity(Intent(this, TestCreateTimeActivity::class.java))
+        }
     }
 
     override fun onResume() {
         super.onResume()
         initView()
-//        object : Thread() {
-//            override fun run() {
-//                super.run()
-//                Looper.prepare() //没有会崩溃
-//                AlertDialog.Builder(this@MainActivity).setTitle("测试").show()
-//                Looper.loop() //没有不显示Dialog
-//            }
-//        }.start()
-//        Thread { Log.e(TAG, "aidl Service testParam ") }.start()
-//
-//        Thread(){
-//            Log.e(TAG, "aidl Service testParam ")
-//        }.start()
     }
 
     private fun initView() {
         proxy.let {  }
-        findViewById<View>(R.id.bindClientService).setOnClickListener { bindClientService() }
+        bindClientService.setOnClickListener { bindClientService() }
         findViewById<View>(R.id.bindRemoteService).setOnClickListener { bindRemoteService() }
         findViewById<View>(R.id.testClientService).setOnClickListener(View.OnClickListener {
             if (proxy == null) {
@@ -174,6 +166,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val TAG = "AIDL-MainActivity"
+        const val TAG = "AIDL-MainActivity"
     }
 }

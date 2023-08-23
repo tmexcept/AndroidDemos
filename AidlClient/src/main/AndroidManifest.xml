@@ -23,6 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.tmexcept.ui.TestCreateTimeActivity" />
 
         <service
             android:name=".aidlservice.ClientService"
