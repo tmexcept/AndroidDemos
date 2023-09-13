@@ -7,6 +7,16 @@
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="$PROJECT_DIR$/../../Android/.gradle/wrapper/dists/gradle-6.1.1-all/cfmwm155h49vnt3hynmlrsdst/gradle-6.1.1" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/AidlClient" />
+            <option value="$PROJECT_DIR$/AidlRemote" />
+            <option value="$PROJECT_DIR$/NativeLearn" />
+            <option value="$PROJECT_DIR$/app" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>

@@ -17,3 +17,5 @@ dependencyResolutionManagement {
 rootProject.name = "AndroidDemos"
 include ':AidlClient'
 include ':AidlRemote'
+include ':NativeLearn'
+include ':app'
